@@ -12,7 +12,26 @@ def test_camera():
         temp_c = None
         temp_f = None
         temp_c, temp_f = thermcam.get_mean_temp()
-
+        print(thermcam._raw_image)
+        print(type(thermcam._raw_image))
+        print(thermcam._raw_image.shape)
+        import numpy as np
+        unique, counts = np.unique(thermcam._raw_image, return_counts=True)
+        value_counts = dict(zip(unique, counts))
+        zero_locs = np.argwhere(thermcam._raw_image == 0)
+        print(f"zero loc: {zero_locs}")
+        zero_vals = [thermcam._raw_image[x[0]][x[1]] for x in zero_locs]
+        print(f"zeros: {zero_vals}")
+        shape = thermcam._raw_image.shape
+        print(f"TEST: {thermcam._raw_image[4:7, 10:12]}")
+        surroundings = [thermcam._raw_image[max(0,x[0]-1):min(shape[0], x[0]+2), max(0, x[1]-1):min(shape[1], x[1]+2)] for x in zero_locs]
+        print(f"surroundings: {surroundings}")
+        print(f"surrounding size: {[s.size for s in surroundings]}")
+        print(f"sums: {[np.sum(x) for x in surroundings]}")
+        # for s in zero_locs:
+        #     thermcam._raw_image[s[0], s[1]] = 999
+        # print(thermcam._raw_image)
+        print(value_counts)
         print("Camera seems to be connected and returning a value:")
         print('Average MLX90640 Temperature: {0:2.1f}C ({1:2.1f}F)'.format(temp_c,temp_f))
         print('To verify it\'s working, change the average temperature')
