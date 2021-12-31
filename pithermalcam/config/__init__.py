@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Tuple
+from typing import Any, Dict, Tuple
 
 
 class Config(ConfigParser):
@@ -20,5 +20,9 @@ class Config(ConfigParser):
     def get_image_size(self) -> Tuple[int, int]:
         image_size = [int(x) for x in self.get("image", "image_size").split(",")]
         return image_size[0], image_size[1]
+
+    def get_colorbar_params(self) -> Dict[str, Any]:
+        return dict(self["colorbar"])
+
 
 config = Config()

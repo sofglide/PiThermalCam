@@ -17,6 +17,7 @@ import numpy as np
 from scipy import ndimage
 
 # Set up logging
+from pithermalcam.colorbar import get_colorbar
 from pithermalcam.config import config
 
 logging.basicConfig(
@@ -150,15 +151,15 @@ class PiThermalCam:
         # Can't apply colormap before ndimage, so reversed in first two options, even though it seems slower
         if self._interpolation_index == 5:  # Scale via scipy only - slowest but seems higher quality
             self._image = ndimage.zoom(self._raw_image, 25)  # interpolate with scipy
-            self._image = cv2.applyColorMap(self._image, cmapy.cmap(self._colormap_list[self._colormap_index]))
+            self._image = cv2.applyColorMap(self._image, self._get_current_cmap())
         elif (
             self._interpolation_index == 6
         ):  # Scale partially via scipy and partially via cv2 - mix of speed and quality
             self._image = ndimage.zoom(self._raw_image, 10)  # interpolate with scipy
-            self._image = cv2.applyColorMap(self._image, cmapy.cmap(self._colormap_list[self._colormap_index]))
+            self._image = cv2.applyColorMap(self._image, self._get_current_cmap())
             self._image = cv2.resize(self._image, config.get_image_web_size(), interpolation=cv2.INTER_CUBIC)
         else:
-            self._image = cv2.applyColorMap(self._raw_image, cmapy.cmap(self._colormap_list[self._colormap_index]))
+            self._image = cv2.applyColorMap(self._raw_image, self._get_current_cmap())
             self._image = cv2.resize(
                 self._image,
                 config.get_image_web_size(),
@@ -170,14 +171,7 @@ class PiThermalCam:
 
     def _add_image_text(self):
         """Set image text content"""
-        if self.use_f:
-            unit_t = "F"
-            temp_min = self._c_to_f(self._temp_min)
-            temp_max = self._c_to_f(self._temp_max)
-        else:
-            unit_t = "C"
-            temp_min = self._temp_min
-            temp_max = self._temp_max
+        temp_min, temp_max, unit_t = self.get_temperature_to_unit()
 
         text = (
             f"Tmin={temp_min:+.1f}{unit_t} - Tmax={temp_max:+.1f}{unit_t} - "
@@ -315,6 +309,7 @@ class PiThermalCam:
         self._pull_raw_image()
         self._process_raw_image()
         self._add_image_text()
+        self._append_colorbar()
         self._current_frame_processed = True
         return self._image
 
@@ -349,6 +344,25 @@ class PiThermalCam:
         norm = np.uint8((f - Tmin) * 255 / (Tmax - Tmin))
         norm.shape = (24, 32)
         return norm
+
+    def _append_colorbar(self):
+        t_min, t_max, _ = self._get_temperature_to_unit()
+        colorbar = get_colorbar(self._image, t_min, t_max, self._get_current_cmap())
+        self._image = cv2.hconcat(self._image, colorbar)
+
+    def _get_current_cmap(self):
+        return cmapy.cmap(self._colormap_list[self._colormap_index])
+
+    def _get_temperature_to_unit(self):
+        if self.use_f:
+            unit_t = "F"
+            temp_min = self._c_to_f(self._temp_min)
+            temp_max = self._c_to_f(self._temp_max)
+        else:
+            unit_t = "C"
+            temp_min = self._temp_min
+            temp_max = self._temp_max
+        return temp_min, temp_max, unit_t
 
     def display_camera_onscreen(self):
         # Loop to display frames unless/until user requests exit
