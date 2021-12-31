@@ -17,6 +17,8 @@ import numpy as np
 from scipy import ndimage
 
 # Set up logging
+from pithermalcam.config import config
+
 logging.basicConfig(
     filename="pithermcam.log",
     filemode="a",
@@ -74,8 +76,8 @@ class PiThermalCam:
         self,
         use_f: bool = False,
         filter_image: bool = False,
-        image_width: int = 1200,
-        image_height: int = 900,
+        image_width: int = config.get_image_size()[0],
+        image_height: int = config.get_image_size()[1],
         output_folder: str = "/home/pi/pithermalcam/saved_snapshots/",
     ):
         self.use_f = use_f
@@ -154,12 +156,12 @@ class PiThermalCam:
         ):  # Scale partially via scipy and partially via cv2 - mix of speed and quality
             self._image = ndimage.zoom(self._raw_image, 10)  # interpolate with scipy
             self._image = cv2.applyColorMap(self._image, cmapy.cmap(self._colormap_list[self._colormap_index]))
-            self._image = cv2.resize(self._image, (800, 600), interpolation=cv2.INTER_CUBIC)
+            self._image = cv2.resize(self._image, config.get_image_web_size(), interpolation=cv2.INTER_CUBIC)
         else:
             self._image = cv2.applyColorMap(self._raw_image, cmapy.cmap(self._colormap_list[self._colormap_index]))
             self._image = cv2.resize(
                 self._image,
-                (800, 600),
+                config.get_image_web_size(),
                 interpolation=self._interpolation_list[self._interpolation_index],
             )
         self._image = cv2.flip(self._image, 1)
