@@ -171,7 +171,7 @@ class PiThermalCam:
 
     def _add_image_text(self):
         """Set image text content"""
-        temp_min, temp_max, unit_t = self.get_temperature_to_unit()
+        temp_min, temp_max, unit_t = self._get_temperature_to_unit()
 
         text = (
             f"Tmin={temp_min:+.1f}{unit_t} - Tmax={temp_max:+.1f}{unit_t} - "
