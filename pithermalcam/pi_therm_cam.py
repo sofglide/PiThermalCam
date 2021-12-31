@@ -169,20 +169,21 @@ class PiThermalCam:
     def _add_image_text(self):
         """Set image text content"""
         if self.use_f:
+            unit_t = "F"
             temp_min = self._c_to_f(self._temp_min)
             temp_max = self._c_to_f(self._temp_max)
-            text = (
-                f"Tmin={temp_min:+.1f}F - Tmax={temp_max:+.1f}F - FPS={1/(time.time() - self._t0):.1f} - "
-                f"Interpo: {self._interpolation_list_name[self._interpolation_index]} - "
-                f"Cmap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
-            )
         else:
-            text = (
-                f"Tmin={self._temp_min:+.1f}C - Tmax={self._temp_max:+.1f}C - "
-                f"FPS={1/(time.time() - self._t0):.1f} - "
-                f"Interp: {self._interpolation_list_name[self._interpolation_index]} - "
-                f"Cmap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
-            )
+            unit_t = "C"
+            temp_min = self._temp_min
+            temp_max = self._temp_max
+
+        text = (
+            f"Tmin={temp_min:+.1f}{unit_t} - Tmax={temp_max:+.1f}{unit_t} - "
+            f"FPS={1/(time.time() - self._t0):.1f} - "
+            f"Interpo: {self._interpolation_list_name[self._interpolation_index]} - "
+            f"Cmap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
+        )
+
         cv2.putText(
             self._image,
             text,
