@@ -6,7 +6,7 @@
 ##################################
 try:  # If called as an imported module
     from pithermalcam import pithermalcam
-except ImportError:  # If run directly
+except ModuleNotFoundError:  # If run directly
     from pi_therm_cam import pithermalcam
 
 import logging
