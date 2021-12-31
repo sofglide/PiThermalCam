@@ -173,24 +173,24 @@ class PiThermalCam:
             temp_max = self._c_to_f(self._temp_max)
             text = (
                 f"Tmin={temp_min:+.1f}F - Tmax={temp_max:+.1f}F - FPS={1/(time.time() - self._t0):.1f} - "
-                f"Interpolation: {self._interpolation_list_name[self._interpolation_index]} - "
-                f"Colormap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
+                f"Interpo: {self._interpolation_list_name[self._interpolation_index]} - "
+                f"Cmap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
             )
         else:
             text = (
                 f"Tmin={self._temp_min:+.1f}C - Tmax={self._temp_max:+.1f}C - "
                 f"FPS={1/(time.time() - self._t0):.1f} - "
-                f"Interpolation: {self._interpolation_list_name[self._interpolation_index]} - "
-                f"Colormap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
+                f"Interp: {self._interpolation_list_name[self._interpolation_index]} - "
+                f"Cmap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
             )
         cv2.putText(
             self._image,
             text,
-            (30, 18),
+            (20, 18),
             cv2.FONT_HERSHEY_SIMPLEX,
-            1.,
+            0.5,
             (255, 255, 255),
-            1,
+            2,
         )
         self._t0 = time.time()  # Update time to this pull
 
