@@ -7,7 +7,8 @@ setuptools.setup(
     name="pithermalcam",
     version="1.0.0",
     author="Tom Shaffner",
-    description="A package which connects an MLX90640 Thermal IR Camera to a Raspberry Pi for viewing or web streaming.",
+    description=("A package which connects an MLX90640 Thermal IR Camera "
+                 "to a Raspberry Pi for viewing or web streaming."),
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://tomshaffner.github.io/PiThermalCam/",
