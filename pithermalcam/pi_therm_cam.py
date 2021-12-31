@@ -27,7 +27,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class pithermalcam:
+class PiThermalCam:
     # See https://gitlab.com/cvejarano-oss/cmapy/-/blob/master/docs/colorize_all_examples.md to for options that
     # can be put in this list
     _colormap_list = [
@@ -380,5 +380,5 @@ if __name__ == "__main__":
     # If class is run as main, read ini and set up a live feed displayed to screen
     out_folder = "/home/pi/PiThermalCam/saved_snapshots/"
 
-    thermcam = pithermalcam(output_folder=out_folder)  # Instantiate class
+    thermcam = PiThermalCam(output_folder=out_folder)  # Instantiate class
     thermcam.display_camera_onscreen()

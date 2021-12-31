@@ -4,14 +4,14 @@
 import numpy as np
 
 from pithermalcam import web_server
-from pithermalcam.pi_therm_cam import pithermalcam
+from pithermalcam.pi_therm_cam import PiThermalCam
 
 
 def test_camera():
     """Check for an average temperature value to ensure the camera is connected and working."""
     # pylint: disable=protected-access
     try:
-        thermcam = pithermalcam()  # Instantiate class
+        thermcam = PiThermalCam()  # Instantiate class
         temp_c, temp_f = thermcam.get_mean_temp()
         print(thermcam._raw_image)
         print(type(thermcam._raw_image))
@@ -55,7 +55,7 @@ def test_camera():
 
 def display_camera_live(output_folder: str = "/home/pi/pithermalcam/saved_snapshots/"):
     """Display the camera live onscreen"""
-    thermcam = pithermalcam(output_folder=output_folder)  # Instantiate class
+    thermcam = PiThermalCam(output_folder=output_folder)  # Instantiate class
     thermcam.display_camera_onscreen()
 
 
@@ -68,4 +68,4 @@ def stream_camera_online(output_folder: str = "/home/pi/pithermalcam/saved_snaps
 
 
 # Add attributes to existing pithermalcam object
-setattr(pithermalcam, "stream_camera_online", stream_camera_online)
+setattr(PiThermalCam, "stream_camera_online", stream_camera_online)

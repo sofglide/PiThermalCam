@@ -4,10 +4,7 @@
 # Flask web server for MLX90640 Thermal Camera w Raspberry Pi
 # If running directly, run from root folder, not pithermalcam folder
 ##################################
-try:  # If called as an imported module
-    from pithermalcam import pithermalcam
-except ModuleNotFoundError:  # If run directly
-    from pi_therm_cam import pithermalcam
+from pithermalcam.pi_therm_cam import PiThermalCam
 
 import logging
 import socket
@@ -152,7 +149,7 @@ def generate():
 def start_server(output_folder: str = "/home/pi/pithermalcam/saved_snapshots/"):
     global thermcam
     # initialize the video stream and allow the camera sensor to warmup
-    thermcam = pithermalcam(output_folder=output_folder)
+    thermcam = PiThermalCam(output_folder=output_folder)
     time.sleep(0.1)
 
     # start a thread that will perform motion detection
