@@ -4,8 +4,6 @@
 # Flask web server for MLX90640 Thermal Camera w Raspberry Pi
 # If running directly, run from root folder, not pithermalcam folder
 ##################################
-from pithermalcam.pi_therm_cam import PiThermalCam
-
 import logging
 import socket
 import threading
@@ -14,6 +12,8 @@ import traceback
 
 import cv2
 from flask import Flask, Response, render_template, request
+
+from pithermalcam.pi_therm_cam import PiThermalCam
 
 # Set up Logger
 logging.basicConfig(
