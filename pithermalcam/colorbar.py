@@ -23,7 +23,7 @@ def get_raw_bar(height, width, cmap):
 
 def get_colorbar(image, tmin, tmax, cmap):
     height = int(image.shape[0])
-    colorbar_params = int(config.get_colorbar_params())
+    colorbar_params = config.get_colorbar_params()
     width = int(colorbar_params["width"])
     v_margin = int(colorbar_params["v_margin"])
     h_margin = int(colorbar_params["h_margin"])
