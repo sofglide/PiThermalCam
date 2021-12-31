@@ -4,10 +4,7 @@
 # Flask web server for MLX90640 Thermal Camera w Raspberry Pi
 # If running directly, run from root folder, not pithermalcam folder
 ##################################
-try:  # If called as an imported module
-    from pithermalcam import PiThermalCam
-except (ImportError, ModuleNotFoundError):  # If run directly
-    from pi_therm_cam import PiThermalCam
+from pithermalcam.pi_therm_cam import PiThermalCam
 
 import logging
 import socket
