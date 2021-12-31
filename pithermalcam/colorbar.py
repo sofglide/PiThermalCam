@@ -22,12 +22,12 @@ def get_raw_bar(height, width, cmap):
 
 
 def get_colorbar(image, tmin, tmax, cmap):
-    height = image.shape[0]
-    colorbar_params = config.get_colorbar_params()
-    width = colorbar_params["width"]
-    v_margin = colorbar_params["v_margin"]
-    h_margin = colorbar_params["h_margin"]
-    step = colorbar_params["step"]
+    height = int(image.shape[0])
+    colorbar_params = int(config.get_colorbar_params())
+    width = int(colorbar_params["width"])
+    v_margin = int(colorbar_params["v_margin"])
+    h_margin = int(colorbar_params["h_margin"])
+    step = int(colorbar_params["step"])
 
     c_bar = get_raw_bar(height, width, cmap=cmap)
     canvas = np.ones((c_bar.shape[0] + 2 * v_margin, c_bar.shape[1] + h_margin, 3), dtype=np.uint8) * 255
