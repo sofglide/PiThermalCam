@@ -34,4 +34,5 @@ env-delete:
 
 .PHONY: start_server
 start_server:
+	mkdir -p logs && \
 	. .venv/bin/activate && PYTHONPATH=. python examples/web_server.py > logs/thermal_out.txt 2>logs/thermal_err.txt
