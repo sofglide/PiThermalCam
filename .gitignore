@@ -64,4 +64,4 @@ pithermalcam.egg-info
 .venv
 
 # logging
-logs
+logs/
