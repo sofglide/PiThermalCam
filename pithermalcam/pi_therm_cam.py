@@ -348,7 +348,7 @@ class PiThermalCam:
     def _append_colorbar(self):
         t_min, t_max, _ = self._get_temperature_to_unit()
         colorbar = get_colorbar(self._image, t_min, t_max, self._get_current_cmap())
-        self._image = cv2.hconcat(self._image, colorbar)
+        self._image = cv2.hconcat([self._image, colorbar])
 
     def _get_current_cmap(self):
         return cmapy.cmap(self._colormap_list[self._colormap_index])
