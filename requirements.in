@@ -16,3 +16,4 @@ adafruit-circuitpython-mlx90640
 flask
 opencv-python
 cmapy
+jupyterlab

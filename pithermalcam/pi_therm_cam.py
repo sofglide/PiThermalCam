@@ -17,6 +17,10 @@ import numpy as np
 from scipy import ndimage
 
 # Set up logging
+from pithermalcam.colorbar import get_colorbar
+from pithermalcam.config import config
+from pithermalcam.dead_pixels import fix_broken_pixels
+
 logging.basicConfig(
     filename="pithermcam.log",
     filemode="a",
@@ -74,8 +78,8 @@ class PiThermalCam:
         self,
         use_f: bool = False,
         filter_image: bool = False,
-        image_width: int = 1200,
-        image_height: int = 900,
+        image_width: int = config.get_image_size()[0],
+        image_height: int = config.get_image_size()[1],
         output_folder: str = "/home/pi/pithermalcam/saved_snapshots/",
     ):
         self.use_f = use_f
@@ -131,7 +135,7 @@ class PiThermalCam:
             self._temp_min = np.min(self._raw_image[np.where(self._raw_image > 0)])
             self._temp_max = np.max(self._raw_image)
             self._raw_image = self._temps_to_rescaled_uints(self._raw_image, self._temp_min, self._temp_max)
-            _fix_broken_pixels(self._raw_image)
+            fix_broken_pixels(self._raw_image)
             self._current_frame_processed = False  # Note that the newly updated raw frame has not been processed
         except ValueError:
             print("Math error; continuing...")
@@ -148,18 +152,18 @@ class PiThermalCam:
         # Can't apply colormap before ndimage, so reversed in first two options, even though it seems slower
         if self._interpolation_index == 5:  # Scale via scipy only - slowest but seems higher quality
             self._image = ndimage.zoom(self._raw_image, 25)  # interpolate with scipy
-            self._image = cv2.applyColorMap(self._image, cmapy.cmap(self._colormap_list[self._colormap_index]))
+            self._image = cv2.applyColorMap(self._image, self._get_current_cmap())
         elif (
             self._interpolation_index == 6
         ):  # Scale partially via scipy and partially via cv2 - mix of speed and quality
             self._image = ndimage.zoom(self._raw_image, 10)  # interpolate with scipy
-            self._image = cv2.applyColorMap(self._image, cmapy.cmap(self._colormap_list[self._colormap_index]))
-            self._image = cv2.resize(self._image, (800, 600), interpolation=cv2.INTER_CUBIC)
+            self._image = cv2.applyColorMap(self._image, self._get_current_cmap())
+            self._image = cv2.resize(self._image, config.get_image_web_size(), interpolation=cv2.INTER_CUBIC)
         else:
-            self._image = cv2.applyColorMap(self._raw_image, cmapy.cmap(self._colormap_list[self._colormap_index]))
+            self._image = cv2.applyColorMap(self._raw_image, self._get_current_cmap())
             self._image = cv2.resize(
                 self._image,
-                (800, 600),
+                config.get_image_web_size(),
                 interpolation=self._interpolation_list[self._interpolation_index],
             )
         self._image = cv2.flip(self._image, 1)
@@ -168,29 +172,23 @@ class PiThermalCam:
 
     def _add_image_text(self):
         """Set image text content"""
-        if self.use_f:
-            temp_min = self._c_to_f(self._temp_min)
-            temp_max = self._c_to_f(self._temp_max)
-            text = (
-                f"Tmin={temp_min:+.1f}F - Tmax={temp_max:+.1f}F - FPS={1/(time.time() - self._t0):.1f} - "
-                f"Interpolation: {self._interpolation_list_name[self._interpolation_index]} - "
-                f"Colormap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
-            )
-        else:
-            text = (
-                f"Tmin={self._temp_min:+.1f}C - Tmax={self._temp_max:+.1f}C - "
-                f"FPS={1/(time.time() - self._t0):.1f} - "
-                f"Interpolation: {self._interpolation_list_name[self._interpolation_index]} - "
-                f"Colormap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
-            )
+        temp_min, temp_max, unit_t = self._get_temperature_to_unit()
+
+        text = (
+            f"Tmin={temp_min:+.1f}{unit_t} - Tmax={temp_max:+.1f}{unit_t} - "
+            f"FPS={1/(time.time() - self._t0):.1f} - "
+            f"Interpo: {self._interpolation_list_name[self._interpolation_index]} - "
+            f"Cmap: {self._colormap_list[self._colormap_index]} - Filtered: {self.filter_image}"
+        )
+
         cv2.putText(
             self._image,
             text,
-            (30, 18),
+            (20, 18),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.4,
+            0.48,
             (255, 255, 255),
-            1,
+            2,
         )
         self._t0 = time.time()  # Update time to this pull
 
@@ -312,6 +310,7 @@ class PiThermalCam:
         self._pull_raw_image()
         self._process_raw_image()
         self._add_image_text()
+        self._append_colorbar()
         self._current_frame_processed = True
         return self._image
 
@@ -347,6 +346,25 @@ class PiThermalCam:
         norm.shape = (24, 32)
         return norm
 
+    def _append_colorbar(self):
+        t_min, t_max, _ = self._get_temperature_to_unit()
+        colorbar = get_colorbar(self._image, t_min, t_max, self._get_current_cmap())
+        self._image = cv2.hconcat([self._image, colorbar])
+
+    def _get_current_cmap(self):
+        return cmapy.cmap(self._colormap_list[self._colormap_index])
+
+    def _get_temperature_to_unit(self):
+        if self.use_f:
+            unit_t = "F"
+            temp_min = self._c_to_f(self._temp_min)
+            temp_max = self._c_to_f(self._temp_max)
+        else:
+            unit_t = "C"
+            temp_min = self._temp_min
+            temp_max = self._temp_max
+        return temp_min, temp_max, unit_t
+
     def display_camera_onscreen(self):
         # Loop to display frames unless/until user requests exit
         while not self._exit_requested:
@@ -358,22 +376,6 @@ class PiThermalCam:
                     print("Too many retries error caught, potential I2C baudrate issue: continuing...")
                     continue
                 raise
-
-
-def _fix_broken_pixels(image):
-    dead_pixels = np.argwhere(image == 0)
-    for px in dead_pixels:
-        _fix_dead_pixel_value(px, image)
-
-
-def _fix_dead_pixel_value(px, image):
-    shape = image.shape
-    surrounding = image[
-        max(0, px[0] - 1) : min(shape[0], px[0] + 2),
-        max(0, px[1] - 1) : min(shape[1], px[1] + 2),
-    ]
-    average = np.sum(surrounding) / (surrounding.size - 1)
-    image[px[0], px[1]] = average
 
 
 if __name__ == "__main__":
