@@ -32,7 +32,7 @@ def get_colorbar(image, tmin, tmax, cmap):
 
     c_bar = get_raw_bar(height - 2 * v_margin, width, cmap=cmap)
     canvas = np.ones((height, h_space + c_bar.shape[1] + h_margin, 3), dtype=np.uint8) * 255
-    canvas[v_margin:-v_margin, h_space: h_space + c_bar.shape[1], :] = c_bar
+    canvas[v_margin:-v_margin, h_space : h_space + c_bar.shape[1], :] = c_bar
 
     t_ticks, t_pos = get_t_ticks(tmin, tmax, step, [v_margin + c_bar.shape[0], v_margin])
     add_ticks_to_colorbar(canvas, t_ticks, t_pos, h_space + c_bar.shape[1])

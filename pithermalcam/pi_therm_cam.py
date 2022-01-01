@@ -19,6 +19,7 @@ from scipy import ndimage
 # Set up logging
 from pithermalcam.colorbar import get_colorbar
 from pithermalcam.config import config
+from pithermalcam.dead_pixels import fix_broken_pixels
 
 logging.basicConfig(
     filename="pithermcam.log",
@@ -134,7 +135,7 @@ class PiThermalCam:
             self._temp_min = np.min(self._raw_image[np.where(self._raw_image > 0)])
             self._temp_max = np.max(self._raw_image)
             self._raw_image = self._temps_to_rescaled_uints(self._raw_image, self._temp_min, self._temp_max)
-            _fix_broken_pixels(self._raw_image)
+            fix_broken_pixels(self._raw_image)
             self._current_frame_processed = False  # Note that the newly updated raw frame has not been processed
         except ValueError:
             print("Math error; continuing...")
@@ -375,22 +376,6 @@ class PiThermalCam:
                     print("Too many retries error caught, potential I2C baudrate issue: continuing...")
                     continue
                 raise
-
-
-def _fix_broken_pixels(image):
-    dead_pixels = np.argwhere(image == 0)
-    for px in dead_pixels:
-        _fix_dead_pixel_value(px, image)
-
-
-def _fix_dead_pixel_value(px, image):
-    shape = image.shape
-    surrounding = image[
-        max(0, px[0] - 1) : min(shape[0], px[0] + 2),
-        max(0, px[1] - 1) : min(shape[1], px[1] + 2),
-    ]
-    average = np.sum(surrounding) / (surrounding.size - 1)
-    image[px[0], px[1]] = average
 
 
 if __name__ == "__main__":
