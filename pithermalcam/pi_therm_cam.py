@@ -186,7 +186,7 @@ class PiThermalCam:
             text,
             (20, 18),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
+            0.48,
             (255, 255, 255),
             2,
         )
