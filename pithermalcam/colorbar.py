@@ -10,9 +10,9 @@ def get_t_ticks(tmin, tmax, step, bounds):
     return t_ticks, t_pos
 
 
-def add_ticks_to_colorbar(canvas, t_ticks, t_pos, y_pos):
+def add_ticks_to_colorbar(canvas, t_ticks, t_pos, x_pos):
     for t, p in zip(t_ticks, t_pos):
-        cv2.putText(canvas, f"_ {t}", (y_pos, p), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+        cv2.putText(canvas, f"_ {t}", (x_pos, p), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
 
 
 def get_raw_bar(height, width, cmap):
@@ -28,12 +28,13 @@ def get_colorbar(image, tmin, tmax, cmap):
     v_margin = int(colorbar_params["v_margin"])
     h_margin = int(colorbar_params["h_margin"])
     step = int(colorbar_params["step"])
+    h_space = int(colorbar_params["h_space"])
 
-    c_bar = get_raw_bar(height, width, cmap=cmap)
-    canvas = np.ones((c_bar.shape[0] + 2 * v_margin, c_bar.shape[1] + h_margin, 3), dtype=np.uint8) * 255
-    canvas[v_margin:-v_margin, : c_bar.shape[1], :] = c_bar
+    c_bar = get_raw_bar(height - 2 * v_margin, width, cmap=cmap)
+    canvas = np.ones((height, h_space + c_bar.shape[1] + h_margin, 3), dtype=np.uint8) * 255
+    canvas[v_margin:-v_margin, h_space: h_space + c_bar.shape[1], :] = c_bar
 
     t_ticks, t_pos = get_t_ticks(tmin, tmax, step, [v_margin + c_bar.shape[0], v_margin])
-    add_ticks_to_colorbar(canvas, t_ticks, t_pos, c_bar.shape[1])
+    add_ticks_to_colorbar(canvas, t_ticks, t_pos, h_space + c_bar.shape[1])
 
     return canvas
