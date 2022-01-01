@@ -63,5 +63,8 @@ pithermalcam.egg-info
 # virtual env
 .venv
 
+# notebooks
+.ipynb_checkpoints/
+
 # logging
 logs/
