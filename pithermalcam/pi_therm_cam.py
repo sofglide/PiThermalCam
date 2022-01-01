@@ -7,6 +7,7 @@ import datetime as dt
 import logging
 import time
 import traceback
+from pathlib import Path
 
 import adafruit_mlx90640
 import board
@@ -86,7 +87,8 @@ class PiThermalCam:
         self.filter_image = filter_image
         self.image_width = image_width
         self.image_height = image_height
-        self.output_folder = output_folder
+        self.output_folder = Path(output_folder)
+        self.output_folder.mkdir(parents=True, exist_ok=True)
 
         self._colormap_index = 0
         self._interpolation_index = 3
