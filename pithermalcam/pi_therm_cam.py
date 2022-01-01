@@ -19,7 +19,7 @@ from scipy import ndimage
 # Set up logging
 from pithermalcam.colorbar import get_colorbar
 from pithermalcam.config import config
-from pithermalcam.dead_pixels import fix_broken_pixels
+from pithermalcam.dead_pixels import fix_broken_pixels, get_min_max
 
 logging.basicConfig(
     filename="pithermcam.log",
@@ -132,7 +132,7 @@ class PiThermalCam:
         self._raw_image = np.zeros((24 * 32,))
         try:
             self.mlx.getFrame(self._raw_image)  # read mlx90640
-            self._temp_min = np.min(self._raw_image[np.where(self._raw_image > 0)])
+            self._temp_min, self._temp_max  = get_min_max(self._raw_image, exclude_dead_px=True)
             self._temp_max = np.max(self._raw_image)
             self._raw_image = self._temps_to_rescaled_uints(self._raw_image, self._temp_min, self._temp_max)
             fix_broken_pixels(self._raw_image)

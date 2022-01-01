@@ -24,7 +24,6 @@ def test_camera():
         zero_vals = [thermcam._raw_image[x[0]][x[1]] for x in zero_locs]
         print(f"zeros: {zero_vals}")
         shape = thermcam._raw_image.shape
-        print(f"TEST: {thermcam._raw_image[4:7, 10:12]}")
         surroundings = [
             thermcam._raw_image[
                 max(0, x[0] - 1) : min(shape[0], x[0] + 2),
