@@ -17,11 +17,10 @@ def _fix_dead_pixel_value(px, image):
     image[px[0], px[1]] = average
 
 
-def get_min_max(raw_image, exclude_dead_px = True):
+def get_min_max(raw_image, exclude_dead_px=True):
     if exclude_dead_px:
         t_min = np.min(raw_image[np.where(raw_image > 0)])
     else:
         t_min = np.min(raw_image)
     t_max = np.max(raw_image)
     return t_min, t_max
-

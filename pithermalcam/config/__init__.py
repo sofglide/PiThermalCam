@@ -13,6 +13,9 @@ class Config(ConfigParser):
         super().__init__()
         self.read(config_file)
 
+    def get_server_http_port(self) -> int:
+        return self.getint("server", "port")
+
     def get_image_web_size(self) -> Tuple[int, int]:
         image_size = [int(x) for x in self.get("image", "web_size").split(",")]
         return image_size[0], image_size[1]

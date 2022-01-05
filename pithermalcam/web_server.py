@@ -13,6 +13,7 @@ import traceback
 import cv2
 from flask import Flask, Response, render_template, request
 
+from pithermalcam.config import config
 from pithermalcam.pi_therm_cam import PiThermalCam
 
 # Set up Logger
@@ -158,7 +159,7 @@ def start_server(output_folder: str = "/home/pi/pithermalcam/saved_snapshots/"):
     t.start()
 
     ip = get_ip_address()
-    port = 8000
+    port = config.get_server_http_port()
 
     print(f"Server can be found at {ip}:{port}")
 
